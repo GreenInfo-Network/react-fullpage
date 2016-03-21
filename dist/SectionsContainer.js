@@ -75,6 +75,13 @@ var SectionsContainer = _react2['default'].createClass({
     if (this.state.activeSection !== nextState.activeSection) {
       this.newSection = true;
     }
+    if (this.props.scrollBar !== nextProps.scrollBar) {
+      // NB: only true -> false handled here as this is the only transition
+      // currently required
+      if (!nextProps.scrollBar) {
+        this._disableScrollBar();
+      }
+    }
   },
 
   componentDidUpdate: function componentDidUpdate(prevProps, prevState) {},
@@ -102,15 +109,7 @@ var SectionsContainer = _react2['default'].createClass({
     window.addEventListener('resize', this._handleResize);
 
     if (!this.props.scrollBar) {
-      this._addCSS3Scroll();
-      this._handleAnchor(); //Go to anchor in case we found it in the URL
-      this.addTransitionEnd();
-
-      window.addEventListener('hashchange', this._handleAnchor, false); //Add an event to watch the url hash changes
-
-      if (this.props.arrowNavigation) {
-        window.addEventListener('keydown', this._handleArrowKeys);
-      }
+      this._disableScrollBar();
     }
 
     // Get actual window height
@@ -124,6 +123,19 @@ var SectionsContainer = _react2['default'].createClass({
     window.removeEventListener('resize', this._handleResize);
     window.removeEventListener('hashchange', this._handleAnchor, false);
     window.removeEventListener('keydown', this._handleArrowKeys);
+  },
+
+  _disableScrollBar: function _disableScrollBar() {
+    // Disable scroll bar--handle scroll via transitions
+    this._addCSS3Scroll();
+    this._handleAnchor(); //Go to anchor in case we found it in the URL
+    this.addTransitionEnd();
+
+    window.addEventListener('hashchange', this._handleAnchor, false); //Add an event to watch the url hash changes
+
+    if (this.props.arrowNavigation) {
+      window.addEventListener('keydown', this._handleArrowKeys);
+    }
   },
 
   _addCSS3Scroll: function _addCSS3Scroll() {
